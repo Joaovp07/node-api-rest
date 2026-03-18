@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload de Foto do Carro</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 500px; margin: 60px auto; }
+        input, button { display: block; margin: 10px 0; padding: 8px; width: 100%; }
+        button { background: #2E4057; color: white; border: none; cursor: pointer; border-radius: 4px; }
+        img { max-width: 100%; margin-top: 20px; display: none; }
+        #resultado { margin-top: 20px; color: green; }
+    </style>
+</head>
+<body>
+    <h2>Upload de Foto do Carro</h2>
+
+    <!--
+        IMPORTANTE: o enctype="multipart/form-data" é OBRIGATÓRIO!
+        Sem ele, o arquivo não é enviado corretamente e o Multer
+        não consegue processar a requisição.
+    -->
+    <form id="formUpload" enctype="multipart/form-data">
+        <label>ID do Carro:</label>
+        <input type="number" id="carroId" placeholder="Ex: 1" required />
+
+        <label>Selecione a foto:</label>
+        <!--
+            O name="foto" aqui deve ser IGUAL ao que usamos
+            no Multer: upload.single('foto')
+        -->
+        <input type="file" name="foto" id="fotoInput" accept="image/*" required />
+
+        <button type="submit">Enviar Foto</button>
+    </form>
+
+    <div id="resultado"></div>
+    <img id="preview" alt="Preview da foto enviada" />
+
+    <script>
+        document.getElementById('formUpload').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            let id = document.getElementById('carroId').value;
+            let fileInput = document.getElementById('fotoInput');
+
+            // FormData é o objeto que monta o multipart/form-data
+            let formData = new FormData();
+            formData.append('foto', fileInput.files[0]);
+
+            try {
+                let response = await fetch(`http://localhost:3000/api/carros/${id}/foto`, {
+                    method: 'POST',
+                    body: formData
+                    // NÃO defina Content-Type aqui!
+                    // O browser define automaticamente com o boundary correto
+                });
+
+                let dados = await response.json();
+                docy5ument.getElementById('resultado').textContent = dados.msg;
+
+                // Mostra preview da imagem enviada
+                let img = document.getElementById('preview');
+                img.src = dados.url;
+                img.style.display = 'block';
+                console.log(formData.get('foto')); // Para verificar o conteúdo do FormData
+
+            } catch (err) {
+                document.getElementById('resultado').textContent = 'Erro: ' + err.message;
+                console.log(err);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API dos Carros</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container mt-4">
+        <h2>API dos Carros!</h2>
+        
+        <div class="card">
+            <div class="card-header bg-dark text-white">Lista de Carros</div>
+            <div class="card-body p-0">
+                <table class="table table-striped mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome</th>
+                            <th>Tipo</th>
+                        </tr>
+                    </thead>
+                     <tbody id="tbody">
+                    <tr>
+                        <td colspan="3" class="text-center text-muted py-4">Carregando...</td>
+                    </tr>
+                </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+         var url = 'http://localhost:3000/api/carros';
+
+    // ── Ao abrir a página, carrega os carros ──────────────
+    // GET /api/carros
+    function getCarros() {
+        fetch(url)
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(carros) {
+                listarCarros(carros);
+            })
+            .catch(function(error) {
+                console.log('Erro: ' + error);
+                document.getElementById('tbody').innerHTML =
+                    '<tr><td colspan="3" class="text-center text-danger">Erro ao conectar na API.</td></tr>';
+            });
+    }
+
+    // ── Preenche a tabela com os carros ───────────────────
+    function listarCarros(carros) {
+        var tbody = document.getElementById('tbody');
+
+        if (carros.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-3">Nenhum carro cadastrado.</td></tr>';
+            return;
+        }
+
+        var html = '';
+        for (var i = 0; i < carros.length; i++) {
+            var carro = carros[i];
+             html += '<tr>';
+            html += '<td>' + carro.id + '</td>';
+            html += '<td>' + carro.nome + '</td>';
+            html += '<td>' + (carro.tipo || '—') + '</td>';
+            html += '<td>';
+            html += '</td>';
+            html += '</tr>';
+        }
+
+        tbody.innerHTML = html;
+    }
+
+    // Chama a função para carregar os carros ao abrir a página
+    getCarros();
+    </script>
+</html>
